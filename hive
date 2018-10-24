@@ -1,0 +1,1121 @@
+A. create database
+------------------
+create database niit;
+
+--this creates a folder by the name of retail.db under /user/hive/warehouse
+
+hive> create database niit;
+
+OK
+Time taken: 0.085 seconds
+
+A1. show all the databases in hive
+----------------------------------
+show databases;
+
+hive> show databases;
+
+OK
+default
+niit
+retail
+student
+Time taken: 0.153 seconds, Fetched: 4 row(s)
+
+B. Select a database
+--------------------
+use niit;
+
+hive> use niit;
+
+OK
+Time taken: 0.121 seconds
+
+B1. Show tables under the database
+----------------------------------
+show tables;
+
+hive> show tables;
+
+OK
+Time taken: 0.131 seconds
+
+
+C1. Create transaction table
+-------------------------------
+create table txnrecords(txnno INT, txndate STRING, custno INT, amount DOUBLE, category STRING, product STRING, city STRING, state STRING, spendby STRING) row format delimited fields terminated by ',' stored as textfile;
+
+hive> create table txnrecords(txnno INT, txndate STRING, custno INT, amount DOUBLE, category STRING, product STRING, city STRING, state STRING, spendby STRING) row format delimited fields terminated by ',' stored as textfile;
+OK
+Time taken: 0.346 seconds
+
+
+C2. Create customer table
+-------------------------------
+create table customer(custno INT, firstname STRING, lastname STRING, age INT, profession STRING)
+row format delimited
+fields terminated by ','
+stored as textfile;
+ 
+hive> create table customer(custno INT, firstname STRING, lastname STRING, age INT, profession STRING)
+    > row format delimited
+    > fields terminated by ','
+    > stored as textfile;
+
+OK
+Time taken: 5.474 seconds
+
+D1. Load the data into the table (from local file system)
+-----------------------------------------------------
+LOAD DATA LOCAL INPATH '/home/divya/Downloads/txns1.txt' OVERWRITE INTO TABLE txnrecords;
+
+hive> LOAD DATA LOCAL INPATH '/home/divya/Downloads/txns1.txt' OVERWRITE INTO TABLE txnrecords;
+
+Loading data to table niit.txnrecords
+Table niit.txnrecords stats: [numFiles=1, numRows=0, totalSize=4418144, rawDataSize=0]
+OK
+Time taken: 3.706 seconds
+
+
+
+
+LOAD DATA LOCAL INPATH '/home/divya/Downloads/custs.txt' OVERWRITE INTO TABLE customer;
+
+hive> LOAD DATA LOCAL INPATH '/home/divya/Downloads/custs.txt' OVERWRITE INTO TABLE customer;
+
+Loading data to table niit.customer
+Table niit.customer stats: [numFiles=1, numRows=0, totalSize=391355, rawDataSize=0]
+OK
+Time taken: 4.914 seconds
+
+D2. Load the data into the table (from hdfs system)
+-----------------------------------------------------
+LOAD DATA INPATH '/user/hduser/txns1.txt' OVERWRITE INTO TABLE txnrecords;
+
+hive> LOAD DATA INPATH '/user/hduser/txns1.txt' OVERWRITE INTO TABLE txnrecords;
+
+Loading data to table niit.txnrecords
+Table niit.txnrecords stats: [numFiles=1, numRows=0, totalSize=4418144, rawDataSize=0]
+OK
+Time taken: 5.42 seconds
+
+
+LOAD DATA INPATH '/user/hduser/custs.txt' OVERWRITE INTO TABLE customer;
+
+hive> LOAD DATA INPATH '/user/hduser/custs.txt' OVERWRITE INTO TABLE customer;
+
+Loading data to table niit.customer
+Table niit.customer stats: [numFiles=1, numRows=0, totalSize=391355, rawDataSize=0]
+OK
+Time taken: 2.245 seconds
+
+"
+trunctate table customer;
+
+hive> truncate table customer;
+
+OK
+Time taken: 16.97 seconds
+
+
+hadoop fs -put custs /niit
+
+hduser@ubuntu:~$ hadoop fs -put file:///home/divya/Downloads/custs.txt  /niit
+
+
+LOAD DATA INPATH '/niit/custs' OVERWRITE INTO TABLE customer;
+
+hive> LOAD DATA INPATH '/niit/custs.txt' OVERWRITE INTO TABLE customer;
+
+Loading data to table niit.customer
+Table niit.customer stats: [numFiles=1, numRows=0, totalSize=391355, rawDataSize=0]
+OK
+Time taken: 2.648 seconds
+
+
+D3. Load the data without header
+--------------------------------
+==create table employee_header(empno INT, empname STRING, salary bigint) row format delimited fields terminated by ',' stored as textfile tblproperties("skip.header.line.count"="1");
+
+hive> create table employee_header(empno INT, empname STRING, salary bigint) row format delimited fields terminated by ',' stored as textfile tblproperties("skip.header.line.count"="1");
+
+OK
+Time taken: 0.809 seconds
+
+
+==load data local inpath '/home/divya/Downloads/Movies.txt' overwrite into table employee_header;
+
+hive> load data local inpath '/home/divya/Downloads/Movies.txt' overwrite into table employee_header;
+
+Loading data to table niit.employee_header
+Table niit.employee_header stats: [numFiles=1, numRows=0, totalSize=34874, rawDataSize=0]
+OK
+Time taken: 1.653 seconds
+
+ 
+E 1. Describing metadata or schema of the table
+---------------------------------------------
+describe txnrecords;
+
+hive> describe txnrecords;
+
+OK
+txnno               	int                 	                    
+txndate             	string              	                    
+custno              	int                 	                    
+amount              	double              	                    
+category            	string              	                    
+product             	string              	                    
+city                	string              	                    
+state               	string              	                    
+spendby             	string              	                    
+Time taken: 0.241 seconds, Fetched: 9 row(s)
+
+
+E 2. Describing detailed metadata or schema of the table
+---------------------------------------------
+describe extended txnrecords;
+
+hive> describe extended txnrecords;
+
+OK
+txnno               	int                 	                    
+txndate             	string              	                    
+custno              	int                 	                    
+amount              	double              	                    
+category            	string              	                    
+product             	string              	                    
+city                	string              	                    
+state               	string              	                    
+spendby             	string              	                    
+	 	 
+Detailed Table Information	Table(tableName:txnrecords, dbName:niit, owner:hduser, createTime:1536919088, lastAccessTime:0, retention:0, sd:StorageDescriptor(cols:[FieldSchema(name:txnno, type:int, comment:null), FieldSchema(name:txndate, type:string, comment:null), FieldSchema(name:custno, type:int, comment:null), FieldSchema(name:amount, type:double, comment:null), FieldSchema(name:category, type:string, comment:null), FieldSchema(name:product, type:string, comment:null), FieldSchema(name:city, type:string, comment:null), FieldSchema(name:state, type:string, comment:null), FieldSchema(name:spendby, type:string, comment:null)], location:hdfs://localhost:54310/user/hive/warehouse/niit.db/txnrecords, inputFormat:org.apache.hadoop.mapred.TextInputFormat, outputFormat:org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat, compressed:false, numBuckets:-1, serdeInfo:SerDeInfo(name:null, serializationLib:org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, parameters:{field.delim=,, serialization.format=,}), bucketCols:[], sortCols:[], parameters:{}, skewedInfo:SkewedInfo(skewedColNames:[], skewedColValues:[], skewedColValueLocationMaps:{}), storedAsSubDirectories:false), partitionKeys:[], parameters:{totalSize=4418144, numRows=0, rawDataSize=0, COLUMN_STATS_ACCURATE=true, numFiles=1, transient_lastDdlTime=1536922000}, viewOriginalText:null, viewExpandedText:null, tableType:MANAGED_TABLE)	
+Time taken: 0.345 seconds, Fetched: 11 row(s)
+
+
+F. Counting no of records
+-------------------------
+select count(*) from txnrecords;
+
+hive> select count(*) from txnrecords;
+
+Query ID = hduser_20180914042241_65b510ac-0cfb-4109-8a41-a8a43ffb149b
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-14 04:22:53,102 Stage-1 map = 0%,  reduce = 0%
+2018-09-14 04:24:02,798 Stage-1 map = 0%,  reduce = 0%
+2018-09-14 04:24:13,957 Stage-1 map = 100%,  reduce = 0%
+2018-09-14 04:24:14,981 Stage-1 map = 100%,  reduce = 100%
+Ended Job = job_local1594890044_0001
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 8836302 HDFS Write: 69748 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+50000
+Time taken: 93.393 seconds, Fetched: 1 row(s)
+
+
+G1. Count of each profession in the Customers List
+---------------------------------------------------
+select profession, count(*) as headcount from customer group by profession order by headcount;
+
+hive> select profession, count(*) as headcount from customer group by profession order by headcount;
+
+Query ID = hduser_20180914042901_25c15b11-f1ce-4096-b8ed-b0715d2a7906
+Total jobs = 2
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-14 04:29:04,806 Stage-1 map = 0%,  reduce = 0%
+2018-09-14 04:29:05,893 Stage-1 map = 100%,  reduce = 0%
+2018-09-14 04:29:06,903 Stage-1 map = 100%,  reduce = 100%
+Ended Job = job_local1194954761_0002
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-14 04:29:20,106 Stage-2 map = 0%,  reduce = 0%
+2018-09-14 04:29:22,409 Stage-2 map = 100%,  reduce = 100%
+Ended Job = job_local1640503704_0003
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 9619012 HDFS Write: 69748 SUCCESS
+Stage-Stage-2:  HDFS Read: 9619012 HDFS Write: 69748 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+	83
+Writer	95
+Artist	175
+Environmental scientist	176
+Dancer	178
+Carpenter	180
+Therapist	187
+Teacher	189
+Judge	189
+Doctor	189
+Economist	189
+Real estate agent	191
+Nurse	191
+Electrical engineer	192
+Automotive mechanic	193
+Civil engineer	193
+Electrician	194
+Psychologist	194
+Agricultural and food scientist	195
+Farmer	196
+Statistician	196
+Athlete	196
+Actor	196
+Accountant	197
+Financial analyst	198
+Reporter	199
+Coach	199
+Secretary	200
+Lawyer	201
+Physicist	201
+Architect	202
+Musician	204
+Engineering technician	204
+Designer	204
+Computer hardware engineer	204
+Chemist	206
+Childcare worker	207
+Veterinarian	208
+Police officer	209
+Pilot	209
+Recreation and fitness worker	210
+Human resources assistant	212
+Social worker	212
+Pharmacist	213
+Computer software engineer	216
+Firefighter	217
+Librarian	218
+Loan officer	221
+Computer support specialist	222
+Photographer	222
+Politician	227
+Time taken: 21.395 seconds, Fetched: 51 row(s)
+
+
+G2. Top 10 Customers List
+------------------------
+select a.custno, b.firstname,b.lastname, b.age, b.profession, sum(a.amount) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+hive> select a.custno, b.firstname,b.lastname, b.age, b.profession, sum(a.amount) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+Query ID = hduser_20180914043130_59414719-ace2-4e1b-b5f3-e881f57f0e3e
+Total jobs = 2
+18/09/14 04:32:17 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Execution log at: /tmp/hduser/hduser_20180914043130_59414719-ace2-4e1b-b5f3-e881f57f0e3e.log
+2018-09-14 04:32:24	Starting to launch local task to process map join;	maximum memory = 518979584
+2018-09-14 04:32:35	Dump the side-table for tag: 1 with group count: 9999 into file: file:/usr/local/hive/iotmp/e4225837-afff-4ba9-ad5b-d702bf0af78d/hive_2018-09-14_04-31-30_163_1004972414303472405-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile01--.hashtable
+2018-09-14 04:32:36	Uploaded 1 File to: file:/usr/local/hive/iotmp/e4225837-afff-4ba9-ad5b-d702bf0af78d/hive_2018-09-14_04-31-30_163_1004972414303472405-1/-local-10005/HashTable-Stage-2/MapJoin-mapfile01--.hashtable (504054 bytes)
+2018-09-14 04:32:36	End of local task; Time Taken: 11.695 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-14 04:32:39,618 Stage-2 map = 0%,  reduce = 0%
+2018-09-14 04:32:42,789 Stage-2 map = 100%,  reduce = 100%
+Ended Job = job_local1950389151_0004
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-14 04:32:44,208 Stage-3 map = 100%,  reduce = 100%
+Ended Job = job_local1072098877_0005
+MapReduce Jobs Launched: 
+Stage-Stage-2:  HDFS Read: 18455300 HDFS Write: 69748 SUCCESS
+Stage-Stage-3:  HDFS Read: 18455300 HDFS Write: 69748 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+
+4009485	Stuart	House	58	Teacher	1973.3
+4006425	Joe	Burns	30	Economist	1732.09
+4000221	Glenda	Boswell	28	Civil engineer	1671.4700000000003
+4003228	Elsie	Newton	54	Accountant	1640.63
+4006606	Jackie	Lewis	66	Recreation and fitness worker	1628.9399999999996
+4006467	Evelyn	Monroe	37	Financial analyst	1605.9499999999998
+4004927	Joan	Lowry	30	Librarian	1576.71
+4008321	Paul	Carey	64	Human resources assistant	1560.79
+4000815	Julie	Galloway	53	Actor	1557.8200000000002
+4001051	Arlene	Higgins	62	Police officer	1488.67
+Time taken: 74.062 seconds, Fetched: 10 row(s)
+
+
+
+
+J.create external tables
+----------------------
+***first load the data set on hadoop
+
+==$ hadoop fs -mkdir /user/training
+
+hduser@ubuntu:~$ hadoop fs -mkdir /user/training
+
+18/09/14 04:35:53 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+==$ hadoop fs -put /home/divya/Downloads/custs.txt /user/training
+
+hduser@ubuntu:~$ hadoop fs -put /home/divya/Downloads/custs.txt /user/training
+18/09/14 04:37:15 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+==create external table customer(custno string, firstname string, lastname string, age int,profession string)
+row format delimited
+fields terminated by ','
+stored as textfile
+
+hive> create external table customer(custno string, firstname string, lastname string, age int,profession string)
+    > row format delimited
+    > fields terminated by ','
+    > stored as textfile;
+
+OK
+Time taken: 1.952 seconds
+
+==select * from customer;        ???????????????
+
+hive> select * from customer;
+OK
+Time taken: 0.947 seconds
+
+
+==describe extended customer;
+
+hive> describe extended customer;
+
+OK
+custno              	string              	                    
+firstname           	string              	                    
+lastname            	string              	                    
+age                 	int                 	                    
+profession          	string              	                    
+	 	 
+Detailed Table Information	Table(tableName:customer, dbName:default, owner:hduser, createTime:1536925178, lastAccessTime:0, retention:0, sd:StorageDescriptor(cols:[FieldSchema(name:custno, type:string, comment:null), FieldSchema(name:firstname, type:string, comment:null), FieldSchema(name:lastname, type:string, comment:null), FieldSchema(name:age, type:int, comment:null), FieldSchema(name:profession, type:string, comment:null)], location:hdfs://localhost:54310/user/hive/warehouse/customer, inputFormat:org.apache.hadoop.mapred.TextInputFormat, outputFormat:org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat, compressed:false, numBuckets:-1, serdeInfo:SerDeInfo(name:null, serializationLib:org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, parameters:{field.delim=,, serialization.format=,}), bucketCols:[], sortCols:[], parameters:{}, skewedInfo:SkewedInfo(skewedColNames:[], skewedColValues:[], skewedColValueLocationMaps:{}), storedAsSubDirectories:false), partitionKeys:[], parameters:{EXTERNAL=TRUE, transient_lastDdlTime=1536925178}, viewOriginalText:null, viewExpandedText:null, tableType:EXTERNAL_TABLE)	
+Time taken: 0.294 seconds, Fetched: 7 row(s)
+hive> select * from customer;
+OK
+Time taken: 0.328 seconds
+
+
+K 1. Inserting output in local file
+------------------------------
+INSERT OVERWRITE LOCAL DIRECTORY '/home/hduser/mindtree/custcount' row format delimited fields terminated by ',' 
+select profession, count(*) as headcount from customer group by profession order by headcount desc limit 10;
+
+
+INSERT OVERWRITE LOCAL DIRECTORY '/home/hduser/mindtree/topten' row format delimited fields terminated by ',' 
+select a.custno, b.firstname,b.lastname, b.age, b.profession, round(sum(a.amount),2) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+
+K 2. Inserting output in hdfs file system
+-------------------------------------------
+INSERT OVERWRITE DIRECTORY '/niit/custcount' row format delimited fields terminated by ',' 
+select profession, count(*) from customer group by profession;
+
+hive> INSERT OVERWRITE DIRECTORY '/niit/custcount' row format delimited fields terminated by ','  select profession, count(*) from customer group by profession;
+
+Query ID = hduser_20180917001001_8d7a2c4c-48a0-4961-bfa6-39af8db72b58
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:10:14,931 Stage-1 map = 0%,  reduce = 0%
+2018-09-17 00:10:20,027 Stage-1 map = 100%,  reduce = 0%
+2018-09-17 00:10:21,062 Stage-1 map = 100%,  reduce = 100%
+Ended Job = job_local481791714_0001
+Moving data to: /niit/custcount
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 0 HDFS Write: 0 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 20.404 seconds
+
+==== use niit;
+
+hive>  INSERT OVERWRITE DIRECTORY '/niit/custcount' row format delimited fields terminated by ','  select profession, count(*) from customer group by profession;
+
+Query ID = hduser_20180917001355_a57e238a-9ecb-47e2-b087-43154c354b06
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:13:57,659 Stage-1 map = 0%,  reduce = 0%
+2018-09-17 00:13:58,717 Stage-1 map = 100%,  reduce = 0%
+2018-09-17 00:13:59,792 Stage-1 map = 100%,  reduce = 100%
+Ended Job = job_local1285525142_0002
+Moving data to: /niit/custcount
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 782710 HDFS Write: 872 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 5.589 seconds
+
+INSERT OVERWRITE DIRECTORY '/niit/topten' row format delimited fields terminated by ',' 
+select a.custno, b.firstname,b.lastname, b.age, b.profession, sum(a.amount) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+
+hive> INSERT OVERWRITE DIRECTORY '/niit/topten' row format delimited fields terminated by ',' 
+    > select a.custno, b.firstname,b.lastname, b.age, b.profession, sum(a.amount) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+
+Query ID = hduser_20180917001502_d96f1b87-d38e-41b4-8f89-ef0781f2b573
+Total jobs = 2
+18/09/17 00:15:29 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Execution log at: /tmp/hduser/hduser_20180917001502_d96f1b87-d38e-41b4-8f89-ef0781f2b573.log
+2018-09-17 00:15:36	Starting to launch local task to process map join;	maximum memory = 518979584
+2018-09-17 00:15:41	Dump the side-table for tag: 1 with group count: 9999 into file: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-15-02_258_1894624713227921099-1/-local-10004/HashTable-Stage-2/MapJoin-mapfile01--.hashtable
+2018-09-17 00:15:42	Uploaded 1 File to: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-15-02_258_1894624713227921099-1/-local-10004/HashTable-Stage-2/MapJoin-mapfile01--.hashtable (504054 bytes)
+2018-09-17 00:15:42	End of local task; Time Taken: 6.074 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:15:46,183 Stage-2 map = 0%,  reduce = 0%
+2018-09-17 00:15:50,233 Stage-2 map = 100%,  reduce = 0%
+2018-09-17 00:15:51,254 Stage-2 map = 100%,  reduce = 100%
+Ended Job = job_local1867374601_0003
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:15:53,179 Stage-3 map = 0%,  reduce = 0%
+2018-09-17 00:15:54,201 Stage-3 map = 100%,  reduce = 100%
+Ended Job = job_local1935475639_0004
+Moving data to: /niit/topten
+MapReduce Jobs Launched: 
+Stage-Stage-2:  HDFS Read: 9620742 HDFS Write: 3488 SUCCESS
+Stage-Stage-3:  HDFS Read: 9620742 HDFS Write: 4000 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 52.314 seconds
+===========
+INSERT OVERWRITE DIRECTORY '/niit/topten' row format delimited fields terminated by ',' 
+select a.custno, b.firstname,b.lastname, b.age, b.profession, sum(a.amount) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+hive> INSERT OVERWRITE DIRECTORY '/niit/topten' row format delimited fields terminated by ',' 
+    > select a.custno, b.firstname,b.lastname, b.age, b.profession, sum(a.amount) as amt from txnrecords a, customer b where a.custno=b.custno group by a.custno, b.firstname, b.lastname, b.age, b.profession order by amt desc limit 10;
+
+Query ID = hduser_20180917001705_2e850b40-6f44-405a-896b-0c9be48a767e
+Total jobs = 2
+18/09/17 00:17:14 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Execution log at: /tmp/hduser/hduser_20180917001705_2e850b40-6f44-405a-896b-0c9be48a767e.log
+2018-09-17 00:17:18	Starting to launch local task to process map join;	maximum memory = 518979584
+2018-09-17 00:17:22	Dump the side-table for tag: 1 with group count: 9999 into file: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-17-05_134_8387014254751022479-1/-local-10004/HashTable-Stage-2/MapJoin-mapfile11--.hashtable
+2018-09-17 00:17:23	Uploaded 1 File to: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-17-05_134_8387014254751022479-1/-local-10004/HashTable-Stage-2/MapJoin-mapfile11--.hashtable (504054 bytes)
+2018-09-17 00:17:23	End of local task; Time Taken: 4.7 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 2
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:17:25,981 Stage-2 map = 0%,  reduce = 0%
+2018-09-17 00:17:28,022 Stage-2 map = 100%,  reduce = 0%
+2018-09-17 00:17:29,037 Stage-2 map = 100%,  reduce = 100%
+Ended Job = job_local93540900_0005
+Launching Job 2 out of 2
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:17:30,873 Stage-3 map = 100%,  reduce = 0%
+2018-09-17 00:17:31,895 Stage-3 map = 100%,  reduce = 100%
+Ended Job = job_local1593584906_0006
+Moving data to: /niit/topten
+MapReduce Jobs Launched: 
+Stage-Stage-2:  HDFS Read: 18458054 HDFS Write: 5536 SUCCESS
+Stage-Stage-3:  HDFS Read: 18458054 HDFS Write: 6048 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 27.11 seconds
+
+
+Q. inserting output into another table ( make sure results table is created beforehand)
+---------------------------------------------------------------------------------------
+create table Airsports(txnno INT, txndate STRING, custno INT, amount DOUBLE, 
+category STRING, product STRING, city STRING, state STRING, spendby STRING)
+row format delimited
+fields terminated by ','
+stored as textfile;
+
+hive> create table Airsports(txnno INT, txndate STRING, custno INT, amount DOUBLE, 
+    > category STRING, product STRING, city STRING, state STRING, spendby STRING)
+    > row format delimited
+    > fields terminated by ','
+    > stored as textfile;
+
+OK
+Time taken: 0.838 seconds
+
+
+
+======
+insert overwrite table Airsports select * from txnrecords where category = 'Air Sports';
+
+hive> insert overwrite table Airsports select * from txnrecords where category = 'Air Sports';
+
+Query ID = hduser_20180917001927_e935ccaa-f108-42c1-b5f1-0a5be257ecfe
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Job running in-process (local Hadoop)
+2018-09-17 00:19:29,099 Stage-1 map = 100%,  reduce = 0%
+Ended Job = job_local1364120386_0007
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:54310/user/hive/warehouse/niit.db/airsports/.hive-staging_hive_2018-09-17_00-19-27_042_2504830711603326114-1/-ext-10000
+Loading data to table niit.airsports
+Table niit.airsports stats: [numFiles=1, numRows=960, totalSize=76248, rawDataSize=75288]
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 13647683 HDFS Write: 80114 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 3.333 seconds
+
+R1. find sales done in each payment mode and their percentage
+--------------------------------------------------------------
+create table totalsales (total bigint)
+row format delimited                                                                                  
+fields terminated by ',';   
+
+hive> create table totalsales (total bigint)
+    > row format delimited                                                                                  
+    > fields terminated by ',';  
+
+OK
+Time taken: 0.221 seconds
+
+
+======
+insert overwrite table totalsales                                                                           
+select sum(amount) from txnrecords;
+
+hive> insert overwrite table totalsales                                                                           
+    > select sum(amount) from txnrecords;
+
+Query ID = hduser_20180917002057_b218f86b-9fda-4d55-bd40-95521f8b2ddb
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:20:59,512 Stage-1 map = 100%,  reduce = 0%
+2018-09-17 00:21:00,527 Stage-1 map = 100%,  reduce = 100%
+Ended Job = job_local191347974_0008
+Loading data to table niit.totalsales
+Table niit.totalsales stats: [numFiles=1, numRows=1, totalSize=8, rawDataSize=7]
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 36131802 HDFS Write: 160307 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 3.904 seconds
+========
+select a.spendby, round(sum(a.amount),2) as typesales, round((sum(a.amount)/total*100),2) as salespercent from txnrecords a, totalsales b group by a.spendby, b.total ;
+
+hive> select a.spendby, round(sum(a.amount),2) as typesales, round((sum(a.amount)/total*100),2) as salespercent from txnrecords a, totalsales b group by a.spendby, b.total ;
+
+Warning: Map Join MAPJOIN[13][bigTable=a] in task 'Stage-2:MAPRED' is a cross product
+Query ID = hduser_20180917002236_22c9deb7-4f8f-4501-ae49-0f84b1d54a8e
+Total jobs = 1
+18/09/17 00:22:49 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Execution log at: /tmp/hduser/hduser_20180917002236_22c9deb7-4f8f-4501-ae49-0f84b1d54a8e.log
+2018-09-17 00:22:52	Starting to launch local task to process map join;	maximum memory = 518979584
+2018-09-17 00:22:56	Dump the side-table for tag: 1 with group count: 1 into file: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-22-36_081_7349953899007225850-1/-local-10004/HashTable-Stage-2/MapJoin-mapfile21--.hashtable
+2018-09-17 00:22:56	Uploaded 1 File to: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-22-36_081_7349953899007225850-1/-local-10004/HashTable-Stage-2/MapJoin-mapfile21--.hashtable (281 bytes)
+2018-09-17 00:22:56	End of local task; Time Taken: 3.734 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:22:59,023 Stage-2 map = 0%,  reduce = 0%
+2018-09-17 00:23:00,045 Stage-2 map = 100%,  reduce = 100%
+Ended Job = job_local1948329518_0009
+MapReduce Jobs Launched: 
+Stage-Stage-2:  HDFS Read: 44968232 HDFS Write: 160386 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+cash	187685.61	3.67
+credit	4923134.93	96.33
+Time taken: 24.015 seconds, Fetched: 2 row(s)
+
+
+R2.find sales based on age group
+--------------------------------
+
+create table out1 (custno int,firstname string,age int,profession string,amount double,product string)
+row format delimited                                                                                  
+fields terminated by ',';   
+
+hive> create table out1 (custno int,firstname string,age int,profession string,amount double,product string)
+    > row format delimited                                                                                  
+    > fields terminated by ',';  
+
+OK
+Time taken: 0.205 seconds
+
+
+=====
+insert overwrite table out1                                                                           
+select a.custno,a.firstname,a.age,a.profession,b.amount,b.product                                     
+from customer a JOIN txnrecords b ON a.custno = b.custno;     
+
+hive> insert overwrite table out1                                                                           
+    > select a.custno,a.firstname,a.age,a.profession,b.amount,b.product                                     
+    > from customer a JOIN txnrecords b ON a.custno = b.custno;  
+
+Query ID = hduser_20180917002511_0c1934b8-6574-4dd3-a577-0a6a1d1dd562
+Total jobs = 1
+18/09/17 00:25:20 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Execution log at: /tmp/hduser/hduser_20180917002511_0c1934b8-6574-4dd3-a577-0a6a1d1dd562.log
+2018-09-17 00:25:23	Starting to launch local task to process map join;	maximum memory = 518979584
+2018-09-17 00:25:28	Dump the side-table for tag: 0 with group count: 9999 into file: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-25-11_348_7434160800202698531-1/-local-10002/HashTable-Stage-4/MapJoin-mapfile30--.hashtable
+2018-09-17 00:25:28	Uploaded 1 File to: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-25-11_348_7434160800202698531-1/-local-10002/HashTable-Stage-4/MapJoin-mapfile30--.hashtable (433377 bytes)
+2018-09-17 00:25:28	End of local task; Time Taken: 5.035 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Job running in-process (local Hadoop)
+2018-09-17 00:25:31,162 Stage-4 map = 0%,  reduce = 0%
+2018-09-17 00:25:33,175 Stage-4 map = 100%,  reduce = 0%
+Ended Job = job_local1158722739_0010
+Loading data to table niit.out1
+Table niit.out1 stats: [numFiles=1, numRows=49995, totalSize=2530172, rawDataSize=2480177]
+MapReduce Jobs Launched: 
+Stage-Stage-4:  HDFS Read: 26902260 HDFS Write: 2610438 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 22.573 seconds
+
+
+======
+
+select * from out1 limit 100;
+
+hive> select * from out1 limit 100;
+
+OK
+4007024	Cameron	59	Actor	40.33	Cardio Machine Accessories
+4006742	Gregory	36	Accountant	198.44	Weightlifting Gloves
+4009775	Ruby	44	Designer	5.58	Weightlifting Machine Accessories
+4002199	Keith	44	Police officer	198.19	Gymnastics Rings
+4002613	Hugh	43	Engineering technician	98.81	Field Hockey
+4007591	Jennifer	54	Electrician	193.63	Camping & Backpacking & Hiking
+4002190	Sheryl	62	Designer	27.89	Jigsaw Puzzles
+4002964	Ken	67	Recreation and fitness worker	96.01	Sandboxes
+4007361	Terri	52	Loan officer	10.44	Snowmobiling
+4004798	Geoffrey	65	Chemist	152.46	Bungee Jumping
+4004646	Frank	64	Computer software engineer	180.28	Archery
+4008071	Ruby	46	Agricultural and food scientist	121.39	Swing Sets
+4002473	Regina	68	Pilot	41.52	Bowling
+4003268	Lillian	35	Firefighter	107.8	Field Hockey
+4004613	Dennis	62	Judge	36.81	Vaulting Horses
+4003179	Kelly	71	Engineering technician	137.64	Fencing
+4009135	Elaine	42	Electrician	35.56	Free Weight Bars
+4006679	Jeanne	22	Judge	75.55	Scuba Diving & Snorkeling
+4002444	Jeanne	72	Therapist	88.65	Baseball
+4008871	Nina	69	Politician	51.81	Life Jackets
+4001364	Nancy	75	Judge	41.55	Weightlifting Belts
+4003144	Samantha	65	Veterinarian	45.79	Parachutes
+4006131	Ken	25	Lawyer	19.64	Kitesurfing
+4007596	Sandra	30	Actor	99.5	Gymnastics Rings
+4009341	Todd	31	Farmer	151.2	Surfing
+4003760	Suzanne	25	Computer support specialist	144.2	Darts
+4000403	Leo	65	Pilot	31.58	Wrestling
+4005211	Jay	36	Photographer	66.4	Mahjong
+4001864	Alexandra	29	Carpenter	79.78	Cricket
+4005691	Brenda	54	Reporter	126.9	Hunting
+4009693	Paul	43	Veterinarian	47.05	Swimming
+4002130	Colleen	55	Civil engineer	5.03	Dice & Dice Sets
+4007790	Clifford	24	Librarian	20.13	Soccer
+4005337	Allison	73	Human resources assistant	154.15	Lawn Games
+4000663	Claire	29	Police officer	98.96	Indoor Volleyball
+4006967	Martin	54	Computer support specialist	185.26	Board Games
+4009055	Eva	68	Veterinarian	35.66	Football
+4005737	Dana	72	Artist	20.2	Shooting Games
+4000175	Ben	35	Computer support specialist	150.6	Camping & Backpacking & Hiking
+4001873	Phyllis	24	Farmer	174.36	Swing Sets
+4006442	Jerome	29	Automotive mechanic	165.1	Cheerleading
+4004237	Gregory	74	Actor	28.11	Bowling
+4007470	Rick	56	Coach	38.52	Tetherball
+4002554	Laura	61	Financial analyst	32.34	Water Polo
+4001041	Crystal	39	Psychologist	135.37	Surfing
+4005646	Tammy	65	Reporter	90.04	Abdominal Equipment
+4005580	Eddie	72	Automotive mechanic	52.29	Vaulting Horses
+4009698	Hilda	48	Firefighter	100.1	Swing Sets
+4009252	Phillip	23	Firefighter	157.94	Exercise Bands
+4003896	Nicole	74	Judge	144.59	Jumping Stilts
+4005578	Hilda	64	Architect	55.93	Pogo Sticks
+4002323	Roger	29	Recreation and fitness worker	32.65	Life Jackets
+4008289	David	25	Electrical engineer	44.82	Lawn Water Slides
+4003091	Joanne	59	Politician	44.46	Scuba Diving & Snorkeling
+4007357	Clara	61	Computer software engineer	154.87	Running
+4004961	Katharine	34	Computer hardware engineer	106.11	Swimming
+4008744	Larry	47	Police officer	176.63	Geocaching
+4007745	Sally	66	Dancer	178.2	Skating
+4003248	Randall	33	Computer support specialist	194.86	Windsurfing
+4002854	Leon	51	Pharmacist	21.43	Snowboarding
+4004874	Danielle	48	Reporter	118.18	Cardio Machine Accessories
+4009680	Ted	38	Electrician	41.14	Weightlifting Machine Accessories
+4000539	Hugh	71	Firefighter	100.93	Beach Volleyball
+4009719	Greg	71	Musician	129.26	Downhill Skiing
+4008455	Laura	59	Computer hardware engineer	105.24	Weightlifting Machine Accessories
+4005887	Neil	45	Physicist	66.06	Riding Scooters
+4006293	Nicholas	63	Teacher	89.14	Tetherball
+4002526	Bob	40		159.14	Poker Chips & Sets
+4006736	Tamara	23	Loan officer	171.57	Ballet Bars
+4005403	Ruby	48	Veterinarian	89.91	Softball
+4006291	Ruby	57	Police officer	32.28	Skating
+4009360	Raymond	39	Doctor	152.21	Cricket
+4001305	Andrea	56	Psychologist	150.82	Skateboarding
+4008653	Toni	39	Athlete	133.2	Riding Scooters
+4002106	Lester	50	Coach	148.31	Portable Electronic Games
+4006262	Denise	33	Financial analyst	125.28	Wrestling
+4003860	Pamela	71	Veterinarian	170.05	Trampolines
+4000458	Harold	40	Musician	74.06	Jigsaw Puzzles
+4002200	Sandy	33	Financial analyst	175.24	Baseball
+4005751	Paige	29	Nurse	39.8	Springboards
+4005625	Herman	30	Architect	174.82	Ice Climbing
+4003500	Dana	51	Artist	188.9	Swimming
+4001098	Curtis	50	Loan officer	21.23	Gymnastics Rings
+4007259	Aaron	38	Engineering technician	22.42	Rock Climbing
+4000293	Kay	44	Childcare worker	49.97	Stopwatches
+4008024	Derek	66	Automotive mechanic	31.84	Swimming
+4008884	Warren	74	Politician	80.99	Tetherball
+4001050	Barbara	73	Actor	89.56	Gymnastics Mats
+4003309	Jacob	35	Reporter	55.35	Towed Water Sports
+4001561	Arlene	51		184.56	Cheerleading
+4009270	Christy	71	Loan officer	176.34	Parachutes
+4002697	Joan	74	Librarian	35.75	Running
+4008469	William	62	Designer	42.51	Team Handball
+4006425	Joe	30	Economist	193.11	Sledding
+4005513	Valerie	62	Dancer	68.86	Jumping Stilts
+4004611	Wendy	27	Architect	146.36	Whitewater Rafting
+4005227	Diane	57	Firefighter	130.52	Medicine Balls
+4002299	Alison	56	Electrician	197.54	Exercise Balls
+4002707	Dana	28	Loan officer	5.95	Dominoes
+4006562	Valerie	44	Computer software engineer	37.29	Lawn Water Slides
+Time taken: 0.25 seconds, Fetched: 100 row(s)
+
+
+=========
+
+create table out2 (custno int,firstname string,age int,profession string,amount double,product string, level string)
+row format delimited                                                                                  
+fields terminated by ',';   
+
+hive> create table out2 (custno int,firstname string,age int,profession string,amount double,product string, level string)
+    > row format delimited                                                                                  
+    > fields terminated by ',';
+ 
+OK
+Time taken: 0.253 seconds
+
+
+======
+
+insert overwrite table out2
+select * , case when age<30 then 'low' when age>=30 and age < 50 then 'middle' when age>=50 then 'old' 
+else 'others' end
+from out1;
+
+hive> insert overwrite table out2
+    > select * , case when age<30 then 'low' when age>=30 and age < 50 then 'middle' when age>=50 then 'old' 
+    > else 'others' end
+    > from out1;
+
+Query ID = hduser_20180917002922_c9d08545-ddac-44be-9bd5-f16e261b6347
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Job running in-process (local Hadoop)
+2018-09-17 00:29:24,955 Stage-1 map = 0%,  reduce = 0%
+2018-09-17 00:29:26,971 Stage-1 map = 100%,  reduce = 0%
+Ended Job = job_local688716880_0011
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://localhost:54310/user/hive/warehouse/niit.db/out2/.hive-staging_hive_2018-09-17_00-29-22_952_5507569072468926389-1/-ext-10000
+Loading data to table niit.out2
+Table niit.out2 stats: [numFiles=1, numRows=49995, totalSize=2784701, rawDataSize=2734706]
+MapReduce Jobs Launched: 
+Stage-Stage-1:  HDFS Read: 29440697 HDFS Write: 5395212 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 4.759 seconds
+
+
+======
+
+select * from out2 limit 100; 
+
+hive> select * from out2 limit 100; 
+
+OK
+4007024	Cameron	59	Actor	40.33	Cardio Machine Accessories	old
+4006742	Gregory	36	Accountant	198.44	Weightlifting Gloves	middle
+4009775	Ruby	44	Designer	5.58	Weightlifting Machine Accessories	middle
+4002199	Keith	44	Police officer	198.19	Gymnastics Rings	middle
+4002613	Hugh	43	Engineering technician	98.81	Field Hockey	middle
+4007591	Jennifer	54	Electrician	193.63	Camping & Backpacking & Hiking	old
+4002190	Sheryl	62	Designer	27.89	Jigsaw Puzzles	old
+4002964	Ken	67	Recreation and fitness worker	96.01	Sandboxes	old
+4007361	Terri	52	Loan officer	10.44	Snowmobiling	old
+4004798	Geoffrey	65	Chemist	152.46	Bungee Jumping	old
+4004646	Frank	64	Computer software engineer	180.28	Archery	old
+4008071	Ruby	46	Agricultural and food scientist	121.39	Swing Sets	middle
+4002473	Regina	68	Pilot	41.52	Bowling	old
+4003268	Lillian	35	Firefighter	107.8	Field Hockey	middle
+4004613	Dennis	62	Judge	36.81	Vaulting Horses	old
+4003179	Kelly	71	Engineering technician	137.64	Fencing	old
+4009135	Elaine	42	Electrician	35.56	Free Weight Bars	middle
+4006679	Jeanne	22	Judge	75.55	Scuba Diving & Snorkeling	low
+4002444	Jeanne	72	Therapist	88.65	Baseball	old
+4008871	Nina	69	Politician	51.81	Life Jackets	old
+4001364	Nancy	75	Judge	41.55	Weightlifting Belts	old
+4003144	Samantha	65	Veterinarian	45.79	Parachutes	old
+4006131	Ken	25	Lawyer	19.64	Kitesurfing	low
+4007596	Sandra	30	Actor	99.5	Gymnastics Rings	middle
+4009341	Todd	31	Farmer	151.2	Surfing	middle
+4003760	Suzanne	25	Computer support specialist	144.2	Darts	low
+4000403	Leo	65	Pilot	31.58	Wrestling	old
+4005211	Jay	36	Photographer	66.4	Mahjong	middle
+4001864	Alexandra	29	Carpenter	79.78	Cricket	low
+4005691	Brenda	54	Reporter	126.9	Hunting	old
+4009693	Paul	43	Veterinarian	47.05	Swimming	middle
+4002130	Colleen	55	Civil engineer	5.03	Dice & Dice Sets	old
+4007790	Clifford	24	Librarian	20.13	Soccer	low
+4005337	Allison	73	Human resources assistant	154.15	Lawn Games	old
+4000663	Claire	29	Police officer	98.96	Indoor Volleyball	low
+4006967	Martin	54	Computer support specialist	185.26	Board Games	old
+4009055	Eva	68	Veterinarian	35.66	Football	old
+4005737	Dana	72	Artist	20.2	Shooting Games	old
+4000175	Ben	35	Computer support specialist	150.6	Camping & Backpacking & Hiking	middle
+4001873	Phyllis	24	Farmer	174.36	Swing Sets	low
+4006442	Jerome	29	Automotive mechanic	165.1	Cheerleading	low
+4004237	Gregory	74	Actor	28.11	Bowling	old
+4007470	Rick	56	Coach	38.52	Tetherball	old
+4002554	Laura	61	Financial analyst	32.34	Water Polo	old
+4001041	Crystal	39	Psychologist	135.37	Surfing	middle
+4005646	Tammy	65	Reporter	90.04	Abdominal Equipment	old
+4005580	Eddie	72	Automotive mechanic	52.29	Vaulting Horses	old
+4009698	Hilda	48	Firefighter	100.1	Swing Sets	middle
+4009252	Phillip	23	Firefighter	157.94	Exercise Bands	low
+4003896	Nicole	74	Judge	144.59	Jumping Stilts	old
+4005578	Hilda	64	Architect	55.93	Pogo Sticks	old
+4002323	Roger	29	Recreation and fitness worker	32.65	Life Jackets	low
+4008289	David	25	Electrical engineer	44.82	Lawn Water Slides	low
+4003091	Joanne	59	Politician	44.46	Scuba Diving & Snorkeling	old
+4007357	Clara	61	Computer software engineer	154.87	Running	old
+4004961	Katharine	34	Computer hardware engineer	106.11	Swimming	middle
+4008744	Larry	47	Police officer	176.63	Geocaching	middle
+4007745	Sally	66	Dancer	178.2	Skating	old
+4003248	Randall	33	Computer support specialist	194.86	Windsurfing	middle
+4002854	Leon	51	Pharmacist	21.43	Snowboarding	old
+4004874	Danielle	48	Reporter	118.18	Cardio Machine Accessories	middle
+4009680	Ted	38	Electrician	41.14	Weightlifting Machine Accessories	middle
+4000539	Hugh	71	Firefighter	100.93	Beach Volleyball	old
+4009719	Greg	71	Musician	129.26	Downhill Skiing	old
+4008455	Laura	59	Computer hardware engineer	105.24	Weightlifting Machine Accessories	old
+4005887	Neil	45	Physicist	66.06	Riding Scooters	middle
+4006293	Nicholas	63	Teacher	89.14	Tetherball	old
+4002526	Bob	40		159.14	Poker Chips & Sets	middle
+4006736	Tamara	23	Loan officer	171.57	Ballet Bars	low
+4005403	Ruby	48	Veterinarian	89.91	Softball	middle
+4006291	Ruby	57	Police officer	32.28	Skating	old
+4009360	Raymond	39	Doctor	152.21	Cricket	middle
+4001305	Andrea	56	Psychologist	150.82	Skateboarding	old
+4008653	Toni	39	Athlete	133.2	Riding Scooters	middle
+4002106	Lester	50	Coach	148.31	Portable Electronic Games	old
+4006262	Denise	33	Financial analyst	125.28	Wrestling	middle
+4003860	Pamela	71	Veterinarian	170.05	Trampolines	old
+4000458	Harold	40	Musician	74.06	Jigsaw Puzzles	middle
+4002200	Sandy	33	Financial analyst	175.24	Baseball	middle
+4005751	Paige	29	Nurse	39.8	Springboards	low
+4005625	Herman	30	Architect	174.82	Ice Climbing	middle
+4003500	Dana	51	Artist	188.9	Swimming	old
+4001098	Curtis	50	Loan officer	21.23	Gymnastics Rings	old
+4007259	Aaron	38	Engineering technician	22.42	Rock Climbing	middle
+4000293	Kay	44	Childcare worker	49.97	Stopwatches	middle
+4008024	Derek	66	Automotive mechanic	31.84	Swimming	old
+4008884	Warren	74	Politician	80.99	Tetherball	old
+4001050	Barbara	73	Actor	89.56	Gymnastics Mats	old
+4003309	Jacob	35	Reporter	55.35	Towed Water Sports	middle
+4001561	Arlene	51		184.56	Cheerleading	old
+4009270	Christy	71	Loan officer	176.34	Parachutes	old
+4002697	Joan	74	Librarian	35.75	Running	old
+4008469	William	62	Designer	42.51	Team Handball	old
+4006425	Joe	30	Economist	193.11	Sledding	middle
+4005513	Valerie	62	Dancer	68.86	Jumping Stilts	old
+4004611	Wendy	27	Architect	146.36	Whitewater Rafting	low
+4005227	Diane	57	Firefighter	130.52	Medicine Balls	old
+4002299	Alison	56	Electrician	197.54	Exercise Balls	old
+4002707	Dana	28	Loan officer	5.95	Dominoes	low
+4006562	Valerie	44	Computer software engineer	37.29	Lawn Water Slides	middle
+Time taken: 0.173 seconds, Fetched: 100 row(s)
+
+
+
+============
+
+describe out2;  
+
+hive> describe out2; 
+ 
+OK
+custno              	int                 	                    
+firstname           	string              	                    
+age                 	int                 	                    
+profession          	string              	                    
+amount              	double              	                    
+product             	string              	                    
+level               	string              	                    
+Time taken: 0.211 seconds, Fetched: 7 row(s)
+
+
+===========
+
+create table out3 (level string, amount double, salespercent double)                      
+row format delimited
+fields terminated by ',';
+
+hive> create table out3 (level string, amount double, salespercent double)                      
+    > row format delimited
+    > fields terminated by ',';
+
+OK
+Time taken: 0.134 seconds
+
+
+========
+
+insert overwrite table out3  
+select a.level, round(sum(a.amount),2) as totalspent, round((sum(a.amount)/total*100),2) as salespercent  from out2 a, totalsales b group by a.level, b.total;
+
+hive> insert overwrite table out3  
+    > select a.level, round(sum(a.amount),2) as totalspent, round((sum(a.amount)/total*100),2) as salespercent  from out2 a, totalsales b group by a.level, b.total;
+
+
+Warning: Map Join MAPJOIN[13][bigTable=a] in task 'Stage-2:MAPRED' is a cross product
+Query ID = hduser_20180917003135_ca162d82-2d2d-4eca-8403-a6b77690c042
+Total jobs = 1
+18/09/17 00:31:45 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Execution log at: /tmp/hduser/hduser_20180917003135_ca162d82-2d2d-4eca-8403-a6b77690c042.log
+2018-09-17 00:31:48	Starting to launch local task to process map join;	maximum memory = 518979584
+2018-09-17 00:31:51	Dump the side-table for tag: 1 with group count: 1 into file: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-31-35_792_5773846498830392018-1/-local-10003/HashTable-Stage-2/MapJoin-mapfile41--.hashtable
+2018-09-17 00:31:52	Uploaded 1 File to: file:/usr/local/hive/iotmp/10ed9796-eca7-44fa-abe5-9b3640ac7ce9/hive_2018-09-17_00-31-35_792_5773846498830392018-1/-local-10003/HashTable-Stage-2/MapJoin-mapfile41--.hashtable (281 bytes)
+2018-09-17 00:31:52	End of local task; Time Taken: 3.139 sec.
+Execution completed successfully
+MapredLocal task succeeded
+Launching Job 1 out of 1
+Number of reduce tasks not specified. Estimated from input data size: 1
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Job running in-process (local Hadoop)
+2018-09-17 00:31:54,429 Stage-2 map = 100%,  reduce = 0%
+2018-09-17 00:31:55,461 Stage-2 map = 100%,  reduce = 100%
+Ended Job = job_local1234574494_0012
+Loading data to table niit.out3
+Table niit.out3 stats: [numFiles=1, numRows=3, totalSize=65, rawDataSize=62]
+MapReduce Jobs Launched: 
+Stage-Stage-2:  HDFS Read: 64467326 HDFS Write: 10790554 SUCCESS
+Total MapReduce CPU Time Spent: 0 msec
+OK
+Time taken: 20.247 seconds
+
+
+========
+
+select * from out3;
+
+hive> select * from out3;
+
+OK
+low	725221.34	14.19
+middle	1855861.67	36.31
+old	2529100.31	49.49
+Time taken: 0.156 seconds, Fetched: 3 row(s)
+
+
+
